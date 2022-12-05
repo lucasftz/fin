@@ -13,15 +13,24 @@ fn main() -> Result<(), io::Error> {
         .map(|entry| entry.unwrap().path())
         .collect();
 
-    let items: Vec<ListItem> = paths
-        .iter()
-        .map(|path| ListItem::new(path.to_str().unwrap()))
-        .collect();
+    let (mut dirs, mut files) = (Vec::new(), Vec::new());
+
+    for path in paths.iter() {
+        let item = ListItem::new(path.to_str().unwrap());
+
+        if path.is_file() {
+            files.push(item);
+        } else {
+            dirs.push(item);
+        }
+    }
+
+    dirs.append(&mut files);
 
     terminal.draw(|frame| {
         let size = frame.size();
-        let list = List::new(items);
-        frame.render_widget(list, size);
+        let items = List::new(dirs);
+        frame.render_widget(items, size);
     })?;
 
     thread::sleep(time::Duration::from_millis(2000));
