@@ -1,4 +1,40 @@
+use std::fs;
+
 use tui_tree_widget::{TreeItem, TreeState};
+
+pub fn get_tree_items(dir: &std::path::PathBuf) -> Vec<TreeItem<'static>> {
+    let mut tree_items: Vec<TreeItem> = Vec::new();
+    let mut files: Vec<TreeItem> = Vec::new();
+
+    for path in fs::read_dir(dir)
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+    {
+        if path.is_file() {
+            files.push(TreeItem::new_leaf(
+                path.file_name()
+                    .unwrap()
+                    .clone()
+                    .to_str()
+                    .unwrap()
+                    .to_owned(),
+            ));
+        } else {
+            tree_items.push(TreeItem::new(
+                path.file_name()
+                    .unwrap()
+                    .clone()
+                    .to_str()
+                    .unwrap()
+                    .to_owned(),
+                get_tree_items(&path),
+            ));
+        }
+    }
+
+    tree_items.append(&mut files);
+    tree_items
+}
 
 pub struct StatefulTree<'a> {
     pub state: TreeState,

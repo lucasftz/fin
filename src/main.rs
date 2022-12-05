@@ -1,50 +1,14 @@
-mod stateful_tree;
 mod utils;
+use crate::utils::term::{restore, setup};
+use crate::utils::tree::{get_tree_items, StatefulTree};
 
-use crate::stateful_tree::StatefulTree;
-use crate::utils::{restore, setup};
+use std::{env, io};
+
 use crossterm::event;
-use std::{env, fs, io};
-use tui_tree_widget::{Tree, TreeItem};
-
-fn get_tree_items(dir: &std::path::PathBuf) -> Vec<TreeItem<'static>> {
-    let mut tree_items: Vec<TreeItem> = Vec::new();
-    let mut files: Vec<TreeItem> = Vec::new();
-
-    for path in fs::read_dir(dir)
-        .unwrap()
-        .map(|entry| entry.unwrap().path())
-    {
-        if path.is_file() {
-            files.push(TreeItem::new_leaf(
-                path.file_name()
-                    .unwrap()
-                    .clone()
-                    .to_str()
-                    .unwrap()
-                    .to_owned(),
-            ));
-        } else {
-            tree_items.push(TreeItem::new(
-                path.file_name()
-                    .unwrap()
-                    .clone()
-                    .to_str()
-                    .unwrap()
-                    .to_owned(),
-                get_tree_items(&path),
-            ));
-        }
-    }
-
-    tree_items.append(&mut files);
-
-    return tree_items;
-}
+use tui_tree_widget::Tree;
 
 fn main() -> Result<(), io::Error> {
     let mut terminal = setup().unwrap();
-
     let mut tree = StatefulTree::with_items(get_tree_items(&env::current_dir().unwrap()));
 
     loop {
