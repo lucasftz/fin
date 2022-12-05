@@ -1,5 +1,5 @@
 mod utils;
-use crate::utils::utils::{restore, setup};
+use crate::utils::{restore, setup};
 
 use std::{env, fs, io, path, thread, time};
 
