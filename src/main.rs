@@ -21,6 +21,10 @@ fn main() -> Result<(), io::Error> {
         if let event::Event::Key(key) = event::read()? {
             match key.code {
                 event::KeyCode::Char('q') => break,
+                event::KeyCode::Char('h') => tree.left(),
+                event::KeyCode::Char('j') => tree.down(),
+                event::KeyCode::Char('k') => tree.up(),
+                event::KeyCode::Char('l') => tree.right(),
                 _ => {}
             }
         };
